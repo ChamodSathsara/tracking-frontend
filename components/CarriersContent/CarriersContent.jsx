@@ -21,28 +21,29 @@ import {
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { CarrierLogo } from "@/components/CarrierLogo/CarrierLogo";
 import { Button } from "@/components/ui/button";
+import { shipments } from "@/Data/shipments";
 
 export function CarriersContent() {
   const [activeTab, setActiveTab] = useState("all");
-  const [shipments, setShipments] = useState({});
+  //const [shipments, setShipments] = useState({});
   // call get all shipment api end point
-  const fetchShipments = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/shipments`
-      );
-      console.log("Shipments:", response.data);
-      setShipments(response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching shipments:", error);
-      return [];
-    }
-  };
+  // const fetchShipments = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_API_URL}/shipments`
+  //     );
+  //     console.log("Shipments:", response.data);
+  //     setShipments(response.data);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error fetching shipments:", error);
+  //     return [];
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchShipments();
-  }, []);
+  // useEffect(() => {
+  //   fetchShipments();
+  // }, []);
 
   // all active shipments of FeedEx
   const activeFedExShipments = shipments.filter(

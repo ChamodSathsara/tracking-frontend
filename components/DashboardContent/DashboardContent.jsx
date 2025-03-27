@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { CarrierLogo } from "@/components/CarrierLogo/CarrierLogo";
-import { shipments } from "@/Data/shipments";
 import { ChartOfPerfomence } from "../PerfomenceChart/PerfomenceChart";
 import { ModeToggle } from "../ModeToggle";
 import axios from "axios";
@@ -55,10 +54,7 @@ export function DashboardContent() {
     fetchMetrics();
   }, []);
 
-  const clickShipmnt = (shipment) => {
-    console.log(shipment);
-  };
-
+  // metrics of needed to cards
   const totalShipments = metricsData.total_shipments; //   all shipments
   const deliveredShipments = metricsData.delivered; // delevered shipments
   const failedShipments = metricsData.failed; //   faild shipments
@@ -176,7 +172,7 @@ export function DashboardContent() {
           <CardHeader>
             <CardTitle>Carrier Performance Comparison</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[400px]">
             {/* Cart of Performence comparism */}
             <ChartOfPerfomence />
           </CardContent>
@@ -200,10 +196,7 @@ export function DashboardContent() {
               <TableBody>
                 {/* filter latest shipments */}
                 {recentShipments.slice(0, 10).map((shipment) => (
-                  <TableRow
-                    key={shipment.id}
-                    onClick={() => clickShipmnt(shipment)}
-                  >
+                  <TableRow key={shipment.id}>
                     <TableCell className="font-medium">
                       {shipment.trackingNumber}
                     </TableCell>

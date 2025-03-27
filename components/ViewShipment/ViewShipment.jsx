@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 
-function ViewShipmen({ isSee, setIsSee, shipment }) {
+function ViewShipmen({ isSee, setIsSee, shipment, fetchShipments }) {
   console.log(isSee);
   const [newShipment, setNewShipment] = useState({});
   const [newStatus, setNewStatus] = useState();
@@ -42,11 +42,9 @@ function ViewShipmen({ isSee, setIsSee, shipment }) {
     }
   };
 
-  // console.log(newShipment);
-
-  if (isSee) {
+  useEffect(() => {
     fetchShipmentById(shipment.id);
-  }
+  }, [shipment]);
 
   const updateShipmentStatus = async (id, newStatus) => {
     console.log(id);
@@ -59,6 +57,7 @@ function ViewShipmen({ isSee, setIsSee, shipment }) {
       console.log("Updated Shipment:", response.data);
       setNewShipment({});
       setIsSee(false);
+      fetchShipments();
       toast.success("Successfully Update...!");
       return response.data;
     } catch (error) {
@@ -81,7 +80,7 @@ function ViewShipmen({ isSee, setIsSee, shipment }) {
           <p>Can you update only Status </p>
         </DialogHeader>
 
-        {/* Add New Shipment form */}
+        {/* View Shipments form */}
         <div className="grid gap-4 py-4">
           {/* trackingNumber */}
           <div className="grid gap-2">
@@ -139,6 +138,7 @@ function ViewShipmen({ isSee, setIsSee, shipment }) {
               value={newShipment.destination}
             />
           </div>
+
           {/* date */}
           <div className="grid gap-2">
             <Label htmlFor="date">Create Date</Label>
@@ -185,6 +185,7 @@ function ViewShipmen({ isSee, setIsSee, shipment }) {
             }}
           />
         </div>
+
         {/* Submit & Cancel Button  */}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setIsSee(false)}>

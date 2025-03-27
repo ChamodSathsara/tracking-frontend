@@ -28,8 +28,14 @@ import axios from "axios";
 
 // Define validation schema using Zod
 const shipmentSchema = z.object({
-  trackingNumber: z.string().min(3, "Tracking Number is required"),
-  customer: z.string().min(3, "Customer name is required"),
+  trackingNumber: z
+    .string()
+    .min(3, "Tracking Number is required")
+    .max(6, "Max Number is 6"),
+  customer: z
+    .string()
+    .min(4, "Customer name is required")
+    .max(10, "Max Number is 6"),
   origin: z.string().min(3, "Origin is required"),
   carrier: z.enum(["FedEx", "DHL"]),
   destination: z.string().min(1, "Destination is required"),
@@ -56,7 +62,7 @@ function AddShipment({ isDialogOpen, setIsDialogOpen, fetchShipments }) {
 
   useEffect(() => {
     fetchMetrics();
-  }, []);
+  }, [fetchShipments]);
   // Initialize react-hook-form with Zod validation
   const {
     register,

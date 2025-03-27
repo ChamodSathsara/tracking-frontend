@@ -15,6 +15,7 @@ import {
 export function AppSidebar({ activeView, setActiveView }) {
   return (
     <Sidebar>
+      {/* Header of Sidebar */}
       <SidebarHeader className="flex h-16 items-center px-4 border-b">
         <div className="flex items-center gap-2 font-semibold text-lg">
           <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-primary-foreground">
@@ -24,8 +25,11 @@ export function AppSidebar({ activeView, setActiveView }) {
           <SidebarTrigger className="ml-auto" />
         </div>
       </SidebarHeader>
+
+      {/* Content of Sidebar */}
       <SidebarContent>
         <SidebarMenu>
+          {/* dashboard bar item */}
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={activeView === "dashboard"}
@@ -35,6 +39,8 @@ export function AppSidebar({ activeView, setActiveView }) {
               <span>Dashboard</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* Shipments bar item */}
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={activeView === "shipment"}
@@ -44,6 +50,8 @@ export function AppSidebar({ activeView, setActiveView }) {
               <span>Shipments</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* Carrier bar item */}
           <SidebarMenuItem>
             <SidebarMenuButton
               isActive={activeView === "carriers"}
@@ -55,6 +63,7 @@ export function AppSidebar({ activeView, setActiveView }) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   );

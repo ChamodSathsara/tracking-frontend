@@ -69,7 +69,6 @@ export function ChartOfPerfomence() {
       delay: metricsData.dhlDelay_count,
     },
   ];
-
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
       <BarChart accessibilityLayer data={chartData}>

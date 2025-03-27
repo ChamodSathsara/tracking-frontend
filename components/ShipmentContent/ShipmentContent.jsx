@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/select";
 
 import { Badge } from "@/components/ui/badge";
-import { shipments as allShipments } from "@/Data/shipments";
-
 import AddShipment from "../AddShipment/AddShipment";
 import TableOfShipments from "../TableOfShipments/TableOfShipments";
 import axios from "axios";
@@ -61,12 +59,14 @@ export function ShipmentContent() {
       filters.status === "all" || shipment.status === filters.status;
     const matchesSearch =
       searchTerm === "" ||
-      shipment.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      String(shipment.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
       shipment.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shipment.destination.toLowerCase().includes(searchTerm.toLowerCase());
 
     return matchesCarrier && matchesStatus && matchesSearch;
   });
+
+  console.log(filteredShipments.length);
 
   const clearFilters = () => {
     setFilters({
@@ -78,6 +78,7 @@ export function ShipmentContent() {
 
   return (
     <div className="space-y-4">
+      {/* Add Shipment button & topic */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">
           Shipment Management
@@ -149,7 +150,7 @@ export function ShipmentContent() {
         searchTerm !== "") && (
         <div className="flex flex-wrap gap-2">
           {filters.carrier !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge className="flex items-center gap-1">
               Carrier: {filters.carrier}
               <X
                 className="h-3 w-3 cursor-pointer"
@@ -158,7 +159,7 @@ export function ShipmentContent() {
             </Badge>
           )}
           {filters.status !== "all" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge className="flex items-center gap-1">
               Status: {filters.status}
               <X
                 className="h-3 w-3 cursor-pointer"
@@ -167,7 +168,7 @@ export function ShipmentContent() {
             </Badge>
           )}
           {searchTerm !== "" && (
-            <Badge variant="secondary" className="flex items-center gap-1">
+            <Badge className="flex items-center gap-1">
               Search: {searchTerm}
               <X
                 className="h-3 w-3 cursor-pointer"
@@ -186,7 +187,10 @@ export function ShipmentContent() {
 
         <CardContent>
           {/* table */}
-          <TableOfShipments filteredShipments={filteredShipments} />
+          <TableOfShipments
+            fetchShipments={fetchShipments}
+            filteredShipments={filteredShipments}
+          />
         </CardContent>
       </Card>
     </div>

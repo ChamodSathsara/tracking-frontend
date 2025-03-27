@@ -20,81 +20,59 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/StatusBadge/StatusBadge";
 import { CarrierLogo } from "@/components/CarrierLogo/CarrierLogo";
-import { Button } from "@/components/ui/button";
-import { shipments } from "@/Data/shipments";
+import axios from "axios";
 
 export function CarriersContent() {
   const [activeTab, setActiveTab] = useState("all");
-  //const [shipments, setShipments] = useState({});
+  const [metricsData, setMetricsData] = useState({});
+  const [shipments, setShipments] = useState([]);
   // call get all shipment api end point
-  // const fetchShipments = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.NEXT_PUBLIC_API_URL}/shipments`
-  //     );
-  //     console.log("Shipments:", response.data);
-  //     setShipments(response.data);
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("Error fetching shipments:", error);
-  //     return [];
-  //   }
-  // };
+  const fetchShipments = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/shipments`
+      );
+      console.log("Shipments:", response.data);
+      setShipments(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching shipments:", error);
+      return [];
+    }
+  };
 
-  // useEffect(() => {
-  //   fetchShipments();
-  // }, []);
+  // call get metrics api end point
+  const fetchMetrics = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/metrics`
+      );
+      console.log("Metrics:", response.data);
+      setMetricsData(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching metrics:", error);
+      return null;
+    }
+  };
 
-  // all active shipments of FeedEx
-  const activeFedExShipments = shipments.filter(
-    (s) => s.carrier === "FedEx" && s.status !== "Failed"
-  ).length;
+  useEffect(() => {
+    console.log("calling use effet");
+    fetchShipments();
+    fetchMetrics();
+  }, []);
 
-  // all active shipments of DHL
-  const activeDhlShipments = shipments.filter(
-    (s) => s.carrier === "DHL" && s.status !== "Failed"
-  ).length;
-
-  // Today shipments of FedEx
-  const deliveredFedExToday = shipments.filter(
-    (s) => s.createdAt === Date.now() && s.carrier === "FedEx"
-  ).length;
-
-  // Today shipments of DHL
-  const deliveredDhlToday = shipments.filter(
-    (s) => s.createdAt === Date.now() && s.carrier === "DHL"
-  ).length;
-
-  // delay shipments of FedEx
-  const delayFedEx = shipments.filter(
-    (s) => s.status === "Delay" && s.carrier === "FedEx"
-  ).length;
-
-  // delay shipments of DHL
-  const delayDhl = shipments.filter(
-    (s) => s.status === "Delay" && s.carrier === "DHL"
-  ).length;
-
-  // success shipments of FedEx
-  const successFedEx = shipments.filter(
-    (s) => s.status === "Delivered" && s.carrier === "FedEx"
-  ).length;
-
-  // success shipments of DHL
-  const successDhl = shipments.filter(
-    (s) => s.status === "Delivered" && s.carrier === "DHL"
-  ).length;
-
-  // all shipments of FeedEx
-  const feedExAll = shipments.filter((s) => s.carrier === "FedEx").length;
-
-  const dhlAll = shipments.filter((s) => s.carrier === "DHL").length;
+  console.log(typeof shipments);
 
   // success delevered shipments
-  const successRate = Math.round((successFedEx / feedExAll) * 100);
+  const successRate = Math.round(
+    (metricsData.fedExDelivered_count / metricsData.feedEx_count) * 100
+  );
 
   // success delevered shipments
-  const successRateDhl = Math.round((successDhl / dhlAll) * 100);
+  const successRateDhl = Math.round(
+    (metricsData.dhlDelivered_count / metricsData.dhl_count) * 100
+  );
 
   // avarage devevery time
   let fedExTotalDeleveryTime = 0;
@@ -102,10 +80,8 @@ export function CarriersContent() {
   for (let i = 0; i < shipments.length; i++) {
     const actualDelivery = new Date(shipments[i].actualDelivery);
     const createdAt = new Date(shipments[i].createdAt);
-
     // Calculate difference in days
     const deliveryTime = (actualDelivery - createdAt) / (1000 * 60 * 60 * 24);
-
     if (shipments[i].carrier === "FedEx") {
       fedExTotalDeleveryTime += deliveryTime;
     } else if (shipments[i].carrier === "DHL") {
@@ -114,10 +90,20 @@ export function CarriersContent() {
   }
 
   // avg delivery time of FedEx
-  const avgFedExDevilevyTime = (fedExTotalDeleveryTime / feedExAll).toFixed(1);
+  const avgFedExDevilevyTime = (
+    fedExTotalDeleveryTime / metricsData.feedEx_count
+  ).toFixed(1);
 
   // avg delivery time of FedEx
-  const avgDhlDevilevyTime = (dhlTotalDeleveryTime / dhlAll).toFixed(1);
+  const avgDhlDevilevyTime = (
+    dhlTotalDeleveryTime / metricsData.dhl_count
+  ).toFixed(1);
+
+  const Fshipments = shipments.filter((s) => s.carrier === "FedEx");
+  const Dshipments = shipments.filter((s) => s.carrier === "DHL");
+
+  const fedExServiceAreas = Fshipments.map((s) => s.destination);
+  const dhlServiceAreas = Dshipments.map((s) => s.destination);
 
   // Sample data for carriers
   const carriers = [
@@ -126,9 +112,9 @@ export function CarriersContent() {
       name: "FedEx",
       logo: "FX",
       color: "blue",
-      activeShipments: activeFedExShipments,
-      deliveredToday: deliveredFedExToday,
-      delayedShipments: delayFedEx,
+      activeShipments: metricsData.feedEx_count,
+      deliveredToday: metricsData.fedExDelivered_count,
+      delayedShipments: metricsData.fedExDelay_count,
       onTimePercentage: successRate,
       avgDeliveryTime: `${avgFedExDevilevyTime} days`,
       contactInfo: {
@@ -136,17 +122,17 @@ export function CarriersContent() {
         email: "support@fedex.com",
         website: "www.fedex.com",
       },
-      serviceAreas: ["North America", "Europe", "Asia", "Australia"],
-      shipments: shipments.filter((s) => s.carrier === "FedEx"),
+      serviceAreas: fedExServiceAreas,
+      shipments: Fshipments,
     },
     {
       id: "dhl",
       name: "DHL",
       logo: "DH",
       color: "yellow",
-      activeShipments: activeDhlShipments,
-      deliveredToday: deliveredDhlToday,
-      delayedShipments: delayDhl,
+      activeShipments: metricsData.dhl_count,
+      deliveredToday: metricsData.dhlDelivered_count,
+      delayedShipments: metricsData.dhlDelay_count,
       onTimePercentage: successRateDhl,
       avgDeliveryTime: `${avgDhlDevilevyTime} days`,
       contactInfo: {
@@ -154,19 +140,14 @@ export function CarriersContent() {
         email: "support@dhl.com",
         website: "www.dhl.com",
       },
-      serviceAreas: [
-        "Europe",
-        "Asia",
-        "Africa",
-        "South America",
-        "North America",
-      ],
-      shipments: shipments.filter((s) => s.carrier === "DHL"),
+      serviceAreas: dhlServiceAreas,
+      shipments: Dshipments,
     },
   ];
 
   // carrier cards
   const renderCarrierCard = (carrier) => {
+    console.log(carrier);
     return (
       <Card key={carrier.id} className="overflow-hidden">
         <CardHeader
@@ -194,7 +175,7 @@ export function CarriersContent() {
             </div>
             <div className="p-4 border-r">
               <div className="text-sm text-muted-foreground">
-                Delivered Today
+                Delivered Shipment
               </div>
               <div className="text-2xl font-bold mt-1">
                 {carrier.deliveredToday}
@@ -260,6 +241,7 @@ export function CarriersContent() {
     );
   };
 
+  // renderCarrierPerformance Card
   const renderCarrierPerformance = () => {
     return (
       <Card>
@@ -326,12 +308,13 @@ export function CarriersContent() {
   };
 
   return (
-    <>
+    <div>
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold tracking-tight">Carriers</h2>
       </div>
 
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        {/* nav bar of tab */}
         <TabsList>
           <TabsTrigger value="all">All Carriers</TabsTrigger>
           <TabsTrigger value="fedex">FedEx</TabsTrigger>
@@ -339,6 +322,7 @@ export function CarriersContent() {
           <TabsTrigger value="performance">Performance</TabsTrigger>
         </TabsList>
 
+        {/* All Tab */}
         <TabsContent value="all" className="space-y-4 mt-4">
           <div className="grid gap-4">
             {renderCarrierPerformance()}
@@ -346,18 +330,21 @@ export function CarriersContent() {
           </div>
         </TabsContent>
 
+        {/* fedEx Tab */}
         <TabsContent value="fedex" className="mt-4">
           {renderCarrierCard(carriers.find((c) => c.id === "fedex"))}
         </TabsContent>
 
+        {/* Dhl Tab */}
         <TabsContent value="dhl" className="mt-4">
           {renderCarrierCard(carriers.find((c) => c.id === "dhl"))}
         </TabsContent>
 
+        {/* Performence tab */}
         <TabsContent value="performance" className="mt-4">
           {renderCarrierPerformance()}
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   );
 }

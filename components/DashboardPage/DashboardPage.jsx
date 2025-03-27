@@ -13,7 +13,10 @@ export function DashboardPage() {
   return (
     <SidebarProvider>
       <div className="flex w-screen min-h-screen">
+        {/* Sidebar Side */}
         <AppSidebar activeView={activeView} setActiveView={setActiveView} />
+
+        {/* Content Side */}
         <SidebarInset className="flex-1">
           <div className="flex-1 space-y-4 p-8 pt-6">
             {activeView === "dashboard" ? (
@@ -21,7 +24,7 @@ export function DashboardPage() {
             ) : activeView === "shipment" ? (
               <ShipmentContent />
             ) : (
-              <CarriersContent />
+              <CarriersContent activeView={activeView} />
             )}
           </div>
         </SidebarInset>
